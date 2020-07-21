@@ -48,6 +48,9 @@
         <el-form-item :label="$t('commons.phone')" prop="phone">
           <el-input v-model="form.phone" autocomplete="off"/>
         </el-form-item>
+        <el-form-item label="用户体验计划" prop="enableGtag">
+          <el-checkbox v-model="enableGtag" autocomplete="off"/>
+        </el-form-item>
       </el-form>
       <template v-slot:footer>
         <ms-dialog-footer
@@ -97,6 +100,7 @@
         updatePath: '/user/update/current',
         updatePasswordPath: '/user/update/password',
         form: {},
+        enableGtag: (localStorage.getItem("enableGtag") === "true"),
         ruleForm: {},
         rule: {
           name: [
@@ -171,6 +175,9 @@
       updateUser(updateUserForm) {
         this.$refs[updateUserForm].validate(valid => {
           if (valid) {
+            console.log(this.enableGtag);
+            localStorage.setItem("enableGtag", this.enableGtag);
+            console.log("enableGtag is " + localStorage.getItem("enableGtag"));
             this.result = this.$post(this.updatePath, this.form, response => {
               this.$success(this.$t('commons.modify_success'));
               localStorage.setItem(TokenKey, JSON.stringify(response.data));

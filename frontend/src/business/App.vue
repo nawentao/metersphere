@@ -45,6 +45,14 @@
         window.location.href = "/login"
       });
     },
+    created: function() {  
+      if (!localStorage.getItem("enableGtag") || localStorage.getItem("enableGtag") === "true") {
+        localStorage.setItem("enableGtag", "true");
+        this.$gtag.optIn();
+      } else {
+        this.$gtag.optOut();
+      }
+    },
     components: {MsLanguageSwitch, MsUser, MsView, MsTopMenus, MsHeaderOrgWs},
     methods: {}
   }

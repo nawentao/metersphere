@@ -16,7 +16,12 @@ import CalendarHeatmap from "../common/js/calendar-heatmap";
 import '../common/css/menu-header.css';
 import '../common/css/main.css';
 import CKEditor from '@ckeditor/ckeditor5-vue';
+import VueGtag from "vue-gtag";
 
+Vue.use(VueGtag, {
+  config: { id: "UA-147297392-9" },
+  enabled: false
+}, router);
 Vue.config.productionTip = false;
 Vue.use(icon);
 Vue.use(ElementUI, {
