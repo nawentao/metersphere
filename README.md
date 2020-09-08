@@ -20,7 +20,18 @@ MeterSphere 是一站式的开源企业级持续测试平台，涵盖测试跟�
 
 ## UI 展示
 
-![UI](https://metersphere.io/images/screenshot/ss07.png)
+![UI](https://metersphere.io/images/screenshot/ss01.png)
+
+## 在线体验
+- 环境地址：https://demo.metersphere.com/
+- 用户名：demo
+- 密码：P@ssw0rd123..
+
+| :warning: 注意 |
+|:---------------------------|
+| 该环境仅作体验目的使用，我们会定时清理、重置数据！ |
+| 请勿修改体验环境用户的密码！ |
+| 请勿在环境中添加业务生产环境地址、用户名密码等敏感信息！ |
 
 ## 快速开始
 
@@ -37,6 +48,10 @@ curl -sSL https://github.com/metersphere/metersphere/releases/latest/download/qu
 
 - [完整文档](https://metersphere.io/docs/)
 - [演示视频](http://video.fit2cloud.com/%E3%80%90%E6%BC%94%E7%A4%BA%E8%A7%86%E9%A2%91%E3%80%91202006%20MeterSphere%20v1.0%20%E5%8A%9F%E8%83%BD%E6%BC%94%E7%A4%BA.mp4)
+
+## MeterSphere 企业版
+[申请企业版使用](https://jinshuju.net/f/CzzAOe)
+> 注: 企业版支持离线安装，申请通过后会提供高速下载链接
 
 ## 相关工具
 
@@ -186,6 +201,12 @@ v1.1.0 是 v1.0.0 之后的功能版本。
 - 中间件: [MySQL](https://www.mysql.com/), [Kafka](https://kafka.apache.org/)
 - 基础设施: [Docker](https://www.docker.com/), [Kubernetes](https://kubernetes.io/)
 - 测试引擎: [JMeter](https://jmeter.apache.org/)
+
+## 致谢
+
+-  [BlazeMeter](https://www.blazemeter.com/)：感谢 BlazeMeter 提供的设计思路
+-  [JMeter](https://jmeter.apache.org/)：MeterSphere 使用了 JMeter 作为测试引擎
+-  [Element](https://element.eleme.cn/#/)：感谢 Element 提供的优秀组件库
 
 ## 加入 MeterSphere 团队
 

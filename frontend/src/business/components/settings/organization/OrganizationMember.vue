@@ -25,7 +25,7 @@
                            :total="total"/>
     </el-card>
 
-    <el-dialog :title="$t('member.create')" :visible.sync="createVisible" width="30%" :destroy-on-close="true"
+    <el-dialog :close-on-click-modal="false" :title="$t('member.create')" :visible.sync="createVisible" width="30%" :destroy-on-close="true"
                @close="handleClose">
       <el-form :model="form" ref="form" :rules="rules" label-position="right" label-width="100px" size="small">
         <el-form-item :label="$t('commons.member')" prop="ids"
@@ -73,7 +73,7 @@
       </template>
     </el-dialog>
 
-    <el-dialog :title="$t('member.modify')" :visible.sync="updateVisible" width="30%" :destroy-on-close="true"
+    <el-dialog :close-on-click-modal="false" :title="$t('member.modify')" :visible.sync="updateVisible" width="30%" :destroy-on-close="true"
                @close="handleClose">
       <el-form :model="form" label-position="right" label-width="100px" size="small" ref="updateUserForm">
         <el-form-item label="ID" prop="id">
@@ -163,7 +163,7 @@
           this.tableData = data.listObject;
           let url = "/userrole/list/org/" + this.currentUser().lastOrganizationId;
           for (let i = 0; i < this.tableData.length; i++) {
-            this.$get(url + "/" + this.tableData[i].id, response => {
+            this.$get(url + "/" + encodeURIComponent(this.tableData[i].id), response => {
               let roles = response.data;
               this.$set(this.tableData[i], "roles", roles);
             })
@@ -217,7 +217,7 @@
           cancelButtonText: this.$t('commons.cancel'),
           type: 'warning'
         }).then(() => {
-          this.result = this.$get('/user/org/member/delete/' + this.currentUser().lastOrganizationId + '/' + row.id, () => {
+          this.result = this.$get('/user/org/member/delete/' + this.currentUser().lastOrganizationId + '/' + encodeURIComponent(row.id), () => {
             this.$success(this.$t('commons.remove_success'));
             this.initTableData();
           });

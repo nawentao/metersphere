@@ -2,8 +2,9 @@
   <div>
     <el-row>
       <el-col :span="8">
-        <h3>{{$t('load_test.params')}}</h3>
-        <el-button :disabled="readOnly" icon="el-icon-circle-plus-outline" plain size="mini" @click="add('params')">{{$t('commons.add')}}
+        <h3>{{ $t('load_test.params') }}</h3>
+        <el-button :disabled="readOnly" icon="el-icon-circle-plus-outline" plain size="mini" @click="add('params')">
+          {{ $t('commons.add') }}
         </el-button>
       </el-col>
     </el-row>
@@ -26,7 +27,7 @@
                 :placeholder="$t('load_test.param_name')"
                 clearable>
               </el-input>
-              <span>{{row.name}}</span>
+              <span>{{ row.name }}</span>
             </template>
           </el-table-column>
           <el-table-column
@@ -60,12 +61,13 @@
                 v-model="row.value"
                 :placeholder="$t('load_test.param_value')"
                 clearable></el-input>
-              <span>{{row.value}}</span>
+              <span>{{ row.value }}</span>
             </template>
           </el-table-column>
           <el-table-column align="center" :label="$t('load_test.operating')">
             <template v-slot:default="{row, $index}">
-              <ms-table-operator-button :disabled="readOnly" :tip="$t('commons.delete')" icon="el-icon-delete" type="danger"
+              <ms-table-operator-button :disabled="readOnly" :tip="$t('commons.delete')" icon="el-icon-delete"
+                                        type="danger"
                                         @exec="del(row, 'params', $index)"/>
             </template>
           </el-table-column>
@@ -77,10 +79,11 @@
       <el-col :span="8">
         <el-form :inline="true">
           <el-form-item>
-            <div>{{$t('load_test.connect_timeout')}}</div>
+            <div>{{ $t('load_test.connect_timeout') }}</div>
           </el-form-item>
           <el-form-item>
-            <el-input-number :disabled="readOnly" size="mini" v-model="timeout" :min="10" :max="100000"></el-input-number>
+            <el-input-number :disabled="readOnly" size="mini" v-model="timeout" :min="10"
+                             :max="100000"></el-input-number>
           </el-form-item>
           <el-form-item>
             ms
@@ -92,10 +95,11 @@
       <el-col :span="8">
         <el-form :inline="true">
           <el-form-item>
-            <div>{{$t('load_test.custom_http_code')}}</div>
+            <div>{{ $t('load_test.custom_http_code') }}</div>
           </el-form-item>
           <el-form-item>
-            <el-input :disabled="readOnly" size="mini" v-model="statusCodeStr" :placeholder="$t('load_test.separated_by_commas')"
+            <el-input :disabled="readOnly" size="mini" v-model="statusCodeStr"
+                      :placeholder="$t('load_test.separated_by_commas')"
                       @input="checkStatusCode"></el-input>
           </el-form-item>
         </el-form>
@@ -132,7 +136,7 @@
       }
     },
     watch: {
-      testId () {
+      testId() {
         if (this.testId) {
           this.getAdvancedConfig();
         }

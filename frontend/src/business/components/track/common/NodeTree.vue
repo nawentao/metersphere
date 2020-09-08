@@ -108,7 +108,6 @@ export default {
   methods: {
     handleDragEnd(draggingNode, dropNode, dropType, ev) {
       let param = this.buildParam(draggingNode, dropNode, dropType);
-      console.log(this.treeNodes);
       this.$post("/case/node/drag", param, () => {
         draggingNode.data.level = param.level;
         this.refreshTable();
@@ -231,10 +230,14 @@ export default {
       this.$emit("refresh");
     },
     nodeExpand(data) {
-      this.expandedNode.push(data.id);
+      if (data.id) {
+        this.expandedNode.push(data.id);
+      }
     },
     nodeCollapse(data) {
-      this.expandedNode.splice(this.expandedNode.indexOf(data.id), 1);
+      if (data.id) {
+        this.expandedNode.splice(this.expandedNode.indexOf(data.id), 1);
+      }
     }
   }
 };

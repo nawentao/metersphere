@@ -26,7 +26,7 @@
                            :total="total"/>
     </el-card>
 
-    <el-dialog :title="$t('member.create')" :visible.sync="createVisible" width="30%" :destroy-on-close="true"
+    <el-dialog :close-on-click-modal="false" :title="$t('member.create')" :visible.sync="createVisible" width="30%" :destroy-on-close="true"
                @close="handleClose">
       <el-form :model="form" ref="form" :rules="rules" label-position="right" label-width="100px" size="small">
         <el-form-item :label="$t('commons.member')" prop="memberSign" :rules="{required: true, message: $t('member.input_id_or_email'), trigger: 'change'}">
@@ -65,7 +65,7 @@
       </template>
     </el-dialog>
 
-    <el-dialog :title="$t('member.modify')" :visible.sync="updateVisible" width="30%" :destroy-on-close="true"
+    <el-dialog :close-on-click-modal="false" :title="$t('member.modify')" :visible.sync="updateVisible" width="30%" :destroy-on-close="true"
                @close="handleClose">
       <el-form :model="form" label-position="right" label-width="100px" size="small" ref="updateUserForm">
         <el-form-item label="ID" prop="id">
@@ -159,7 +159,7 @@
           this.tableData = data.listObject;
           let url = "/userrole/list/ws/" + this.currentUser().lastWorkspaceId;
           for (let i = 0; i < this.tableData.length; i++) {
-            this.$get(url + "/" + this.tableData[i].id, response => {
+            this.$get(url + "/" + encodeURIComponent(this.tableData[i].id), response => {
               let roles = response.data;
               this.$set(this.tableData[i], "roles", roles);
             })
@@ -183,7 +183,7 @@
           cancelButtonText: this.$t('commons.cancel'),
           type: 'warning'
         }).then(() => {
-          this.result = this.$get('/user/ws/member/delete/' + this.currentUser().lastWorkspaceId + '/' + row.id,() => {
+          this.result = this.$get('/user/ws/member/delete/' + this.currentUser().lastWorkspaceId + '/' + encodeURIComponent(row.id),() => {
             this.$success(this.$t('commons.remove_success'));
             this.initTableData();
           });

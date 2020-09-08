@@ -11,12 +11,13 @@
 
         </template>
 
-        <one-click-operation ref="OneClickOperation" :select-ids="selectIds" :select-names="selectNames"
-                             :select-project-names="selectProjectNames"></one-click-operation>
+        <one-click-operation ref="OneClickOperation" :select-ids="selectIds"
+                             :select-project-names="selectProjectNames" :select-project-id="selectProjectId"
+                             @refresh="init()"></one-click-operation>
 
         <el-table border :data="tableData" class="adjust-table table-content" @sort-change="sort"
                   @row-click="handleView"
-                  @filter-change="filter" @select-all="handleSelectAll" @select="selectionChange">
+                  @filter-change="filter" @select-all="select" @select="select">
           <el-table-column
             type="selection"></el-table-column>
           <el-table-column prop="name" :label="$t('commons.name')" width="250" show-overflow-tooltip>
@@ -51,6 +52,9 @@
         <ms-table-pagination :change="search" :current-page.sync="currentPage" :page-size.sync="pageSize"
                              :total="total"/>
       </el-card>
+
+      <api-copy-dialog ref="apiCopy" @refresh="search"/>
+
     </ms-main-container>
   </ms-container>
 </template>
@@ -66,9 +70,12 @@
   import MsTableOperators from "../../common/components/MsTableOperators";
   import {_filter, _sort} from "@/common/js/utils";
   import {TEST_CONFIGS} from "../../common/components/search/search-components";
+  import {ApiEvent, LIST_CHANGE} from "@/business/components/common/head/ListEvent";
+  import ApiCopyDialog from "./components/ApiCopyDialog";
 
   export default {
     components: {
+      ApiCopyDialog,
       OneClickOperation,
       MsTableOperators,
       MsApiTestStatus, MsMainContainer, MsContainer, MsTableHeader, MsTablePagination, MsTableOperator
@@ -87,8 +94,8 @@
         total: 0,
         loading: false,
         selectIds: new Set(),
-        selectNames: new Set(),
         selectProjectNames: new Set(),
+        selectProjectId: new Set(),
         buttons: [
           {
             tip: this.$t('commons.edit'), icon: "el-icon-edit",
@@ -120,26 +127,15 @@
       create() {
         this.$router.push('/api/test/create');
       },
-
-      handleSelectAll(selection) {
-        if (selection.length > 0) {
-          this.tableData.forEach(item => {
-            this.selectIds.add(item.id);
-            this.selectProjectNames.add(item.projectName)
-          });
-        } else {
-          this.selectIds.clear()
-          this.selectProjectNames.clear()
-        }
-      },
-      selectionChange(selection, row) {
-        if (this.selectIds.has(row.id)) {
-          this.selectIds.delete(row.id);
-          this.selectProjectNames.delete(row.projectName)
-        } else {
-          this.selectIds.add(row.id);
-          this.selectProjectNames.add(row.projectName)
-        }
+      select(selection) {
+        this.selectIds.clear()
+        this.selectProjectNames.clear()
+        this.selectProjectId.clear()
+        selection.forEach(s => {
+          this.selectIds.add(s.id)
+          this.selectProjectNames.add(s.projectName)
+          this.selectProjectId.add(s.projectId)
+        })
       },
       runTest() {
         if (this.selectIds.size < 1) {
@@ -157,9 +153,6 @@
           let data = response.data;
           this.total = data.itemCount;
           this.tableData = data.listObject;
-          this.tableData.forEach(item => {
-            this.selectNames.add(item.name)
-          })
         });
       },
       handleSelectionChange(val) {
@@ -183,18 +176,20 @@
               this.result = this.$post("/api/delete", {id: test.id}, () => {
                 this.$success(this.$t('commons.delete_success'));
                 this.search();
+                // 发送广播，刷新 head 上的最新列表
+                ApiEvent.$emit(LIST_CHANGE);
               });
             }
           }
         });
       },
       handleCopy(test) {
-        this.result = this.$post("/api/copy", {projectId: test.projectId, id: test.id, name: test.name}, () => {
-          this.$success(this.$t('commons.copy_success'));
-          this.search();
-        });
+        this.$refs.apiCopy.open(test);
       },
       init() {
+        this.selectIds.clear()
+        this.selectProjectNames.clear()
+        this.selectIds.clear()
         this.projectId = this.$route.params.projectId;
         if (this.projectId && this.projectId !== "all") {
           this.$store.commit('setProjectId', this.projectId);

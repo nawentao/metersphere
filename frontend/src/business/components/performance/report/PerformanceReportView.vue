@@ -22,9 +22,10 @@
                          @click="rerun(testId)">
                 {{ $t('report.test_execute_again') }}
               </el-button>
-              <!--<el-button :disabled="isReadOnly" type="info" plain size="mini">
-                {{$t('report.export')}}
-              </el-button>
+              <!-- <el-button :disabled="isReadOnly" type="info" plain size="mini" @click="exports(reportName)">
+                 {{$t('report.export')}}
+               </el-button>-->
+              <!--
               <el-button :disabled="isReadOnly" type="warning" plain size="mini">
                 {{$t('report.compare')}}
               </el-button>-->
@@ -44,24 +45,26 @@
         </el-row>
 
         <el-divider/>
+        <div ref="resume">
+          <el-tabs v-model="active" type="border-card" :stretch="true">
+            <el-tab-pane :label="$t('load_test.pressure_config')">
+              <ms-performance-pressure-config :is-read-only="true" :report="report"/>
+            </el-tab-pane>
+            <el-tab-pane :label="$t('report.test_overview')">
+              <ms-report-test-overview :report="report" ref="testOverview"/>
+            </el-tab-pane>
+            <el-tab-pane :label="$t('report.test_request_statistics')">
+              <ms-report-request-statistics :report="report"/>
+            </el-tab-pane>
+            <el-tab-pane :label="$t('report.test_error_log')">
+              <ms-report-error-log :report="report"/>
+            </el-tab-pane>
+            <el-tab-pane :label="$t('report.test_log_details')">
+              <ms-report-log-details :report="report"/>
+            </el-tab-pane>
+          </el-tabs>
+        </div>
 
-        <el-tabs v-model="active" type="border-card" :stretch="true">
-          <el-tab-pane :label="$t('load_test.pressure_config')">
-            <ms-performance-pressure-config :is-read-only="true" :report="report"/>
-          </el-tab-pane>
-          <el-tab-pane :label="$t('report.test_overview')">
-            <ms-report-test-overview :report="report" ref="testOverview"/>
-          </el-tab-pane>
-          <el-tab-pane :label="$t('report.test_request_statistics')">
-            <ms-report-request-statistics :report="report"/>
-          </el-tab-pane>
-          <el-tab-pane :label="$t('report.test_error_log')">
-            <ms-report-error-log :report="report"/>
-          </el-tab-pane>
-          <el-tab-pane :label="$t('report.test_log_details')">
-            <ms-report-log-details :report="report"/>
-          </el-tab-pane>
-        </el-tabs>
 
       </el-card>
       <el-dialog :title="$t('report.test_stop_now_confirm')" :visible.sync="dialogFormVisible" width="30%">
@@ -124,7 +127,7 @@ export default {
     }
   },
   methods: {
-    initBreadcrumb() {
+    initBreadcrumb(callback) {
       if (this.reportId) {
         this.result = this.$get("/performance/report/test/pro/info/" + this.reportId, res => {
           let data = res.data;
@@ -134,11 +137,19 @@ export default {
             this.testName = data.testName;
             this.projectId = data.projectId;
             this.projectName = data.projectName;
+            //
+            if (callback) callback(res);
+          } else {
+            this.$error(this.$t('report.not_exist'));
           }
         })
       }
     },
     initReportTimeInfo() {
+      if (this.status === 'Starting') {
+        this.clearData();
+        return;
+      }
       if (this.reportId) {
         this.result = this.$get("/performance/report/content/report_time/" + this.reportId)
           .then(res => {
@@ -152,7 +163,7 @@ export default {
             }
           }).catch(() => {
             this.clearData();
-          })
+          });
       }
     },
     initWebSocket() {
@@ -223,10 +234,15 @@ export default {
     onMessage(e) {
       this.$set(this.report, "refresh", e.data); // 触发刷新
       this.$set(this.report, "status", 'Running');
+      this.status = 'Running';
       this.initReportTimeInfo();
       window.console.log('receive a message:', e.data);
     },
     onClose(e) {
+      if (e.code === 1005) {
+        // 强制删除之后关闭socket，不用刷新report
+        return;
+      }
       this.$set(this.report, "refresh", Math.random()); // 触发刷新
       this.$set(this.report, "status", 'Completed');
       this.initReportTimeInfo();
@@ -259,9 +275,6 @@ export default {
     });
 
   },
-  beforeDestroy() {
-    this.websocket.close() //离开路由之后断开websocket连接
-  },
   watch: {
     '$route'(to) {
       if (to.name === "perReportView") {
@@ -271,42 +284,19 @@ export default {
         }
         let reportId = to.path.split('/')[4];
         this.reportId = reportId;
-        if (reportId) {
-          this.$get("/performance/report/test/pro/info/" + reportId, response => {
-            let data = response.data;
-            if (data) {
-              this.status = data.status;
-              this.reportName = data.name;
-              this.testName = data.testName;
-              this.testId = data.testId;
-              this.projectName = data.projectName;
+        this.initBreadcrumb((response) => {
+          let data = response.data;
 
-              this.$set(this.report, "id", reportId);
-              this.$set(this.report, "status", data.status);
+          this.$set(this.report, "id", reportId);
+          this.$set(this.report, "status", data.status);
 
-              this.checkReportStatus(data.status);
-              if (this.status === "Completed") {
-                this.result = this.$get("/performance/report/content/report_time/" + this.reportId).then(res => {
-                  let data = res.data.data;
-                  if (data) {
-                    this.startTime = data.startTime;
-                    this.endTime = data.endTime;
-                    let duration = data.duration;
-                    this.minutes = Math.floor(duration / 60);
-                    this.seconds = duration % 60;
-                  }
-                }).catch(() => {
-                  this.clearData();
-                })
-              } else {
-                this.clearData();
-              }
-            } else {
-              this.$error(this.$t('report.not_exist'));
-            }
-          });
-
-        }
+          this.checkReportStatus(data.status);
+          this.initReportTimeInfo();
+        });
+        this.initWebSocket();
+      } else {
+        console.log("close socket.");
+        this.websocket.close() //离开路由之后断开websocket连接
       }
     }
   }

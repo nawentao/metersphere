@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="$t('api_test.api_import.title')" :visible.sync="visible" class="api-import" v-loading="result.loading" @close="close">
+  <el-dialog :close-on-click-modal="false" :title="$t('api_test.api_import.title')" :visible.sync="visible" class="api-import" v-loading="result.loading" @close="close">
 
     <div class="header-bar">
       <div>{{$t('api_test.api_import.data_format')}}</div>
@@ -237,7 +237,7 @@
               if (!this.swaggerUrlEable) {
                 param.swaggerUrl = undefined;
               }
-              this.result = this.$fileUpload('/api/import', param.file, param,response => {
+              this.result = this.$fileUpload('/api/import', param.file, null, param,response => {
                 let res = response.data;
                 this.$success(this.$t('test_track.case.import.success'));
                 this.visible = false;

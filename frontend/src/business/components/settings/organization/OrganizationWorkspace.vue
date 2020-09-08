@@ -24,7 +24,7 @@
                            :total="total"/>
     </el-card>
 
-    <el-dialog :title="$t('workspace.create')" :visible.sync="dialogWsAddVisible" width="30%" @close="close">
+    <el-dialog :close-on-click-modal="false" :title="$t('workspace.create')" :visible.sync="dialogWsAddVisible" width="30%" @close="close">
       <el-form :model="form" :rules="rules" ref="form" label-position="right" label-width="100px" size="small">
         <el-form-item :label="$t('commons.name')" prop="name">
           <el-input v-model="form.name" autocomplete="off"/>
@@ -39,7 +39,7 @@
           @confirm="submit('form')"/>
       </template>
     </el-dialog>
-    <el-dialog :title="$t('workspace.update')" :visible.sync="dialogWsUpdateVisible" width="30%">
+    <el-dialog :close-on-click-modal="false" :title="$t('workspace.update')" :visible.sync="dialogWsUpdateVisible" width="30%">
       <el-form :model="form" :rules="rules" ref="form" label-position="right" label-width="100px" size="small">
         <el-form-item :label="$t('commons.name')" prop="name">
           <el-input v-model="form.name" autocomplete="off"/>
@@ -56,7 +56,7 @@
     </el-dialog>
 
     <!-- dialog of workspace member -->
-    <el-dialog :visible.sync="dialogWsMemberVisible" width="70%" :destroy-on-close="true" @close="close"
+    <el-dialog :close-on-click-modal="false" :visible.sync="dialogWsMemberVisible" width="70%" :destroy-on-close="true" @close="close"
                class="dialog-css">
       <ms-table-header :condition.sync="dialogCondition" @create="addMember" @search="dialogSearch"
                        :create-tip="$t('member.create')" :title="$t('commons.member')"/>
@@ -82,7 +82,7 @@
     </el-dialog>
 
     <!-- add workspace member dialog -->
-    <el-dialog :title="$t('member.create')" :visible.sync="dialogWsMemberAddVisible" width="30%"
+    <el-dialog :close-on-click-modal="false" :title="$t('member.create')" :visible.sync="dialogWsMemberAddVisible" width="30%"
                :destroy-on-close="true"
                @close="closeFunc">
       <el-form :model="memberForm" ref="form" :rules="wsMemberRule" label-position="right" label-width="100px"
@@ -125,7 +125,7 @@
     </el-dialog>
 
     <!-- update workspace member dialog -->
-    <el-dialog :title="$t('member.modify')" :visible.sync="dialogWsMemberUpdateVisible" width="30%"
+    <el-dialog :close-on-click-modal="false" :title="$t('member.modify')" :visible.sync="dialogWsMemberUpdateVisible" width="30%"
                :destroy-on-close="true"
                @close="closeFunc">
       <el-form :model="memberForm" label-position="right" label-width="100px" size="small" ref="updateUserForm">
@@ -316,7 +316,7 @@
           let url = "/userrole/list/ws/" + row.id;
           // 填充角色信息
           for (let i = 0; i < this.memberLineData.length; i++) {
-            this.$get(url + "/" + this.memberLineData[i].id, response => {
+            this.$get(url + "/" + encodeURIComponent(this.memberLineData[i].id), response => {
               let roles = response.data;
               this.$set(this.memberLineData[i], "roles", roles);
             })
@@ -336,7 +336,7 @@
           let url = "/userrole/list/ws/" + row.id;
           // 填充角色信息
           for (let i = 0; i < this.memberLineData.length; i++) {
-            this.$get(url + "/" + this.memberLineData[i].id, response => {
+            this.$get(url + "/" + encodeURIComponent(this.memberLineData[i].id), response => {
               let roles = response.data;
               this.$set(this.memberLineData[i], "roles", roles);
             })
@@ -393,7 +393,7 @@
           cancelButtonText: this.$t('commons.cancel'),
           type: 'warning'
         }).then(() => {
-          this.result = this.$get('/user/ws/member/delete/' + this.currentWorkspaceRow.id + '/' + row.id, () => {
+          this.result = this.$get('/user/ws/member/delete/' + this.currentWorkspaceRow.id + '/' + encodeURIComponent(row.id), () => {
             this.$success(this.$t('commons.remove_success'));
             this.cellClick(this.currentWorkspaceRow);
           });
